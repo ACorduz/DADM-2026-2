@@ -1,10 +1,140 @@
 package com.example.reto3
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var mGame: TicTacToeGame
+    private lateinit var mBoardButtons: Array<Button>
+    private lateinit var mInfoTextView: TextView
+    private lateinit var mHumanScoreView: TextView
+    private lateinit var mTiesScoreView: TextView
+    private lateinit var mComputerScoreView: TextView
+
+    private var mGameOver = false
+    private var mHumanGoesFirst = true
+
+    private var mHumanScore = 0
+    private var mTiesScore = 0
+    private var mComputerScore = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        mBoardButtons = arrayOf(
+            findViewById(R.id.one), findViewById(R.id.two), findViewById(R.id.three),
+            findViewById(R.id.four), findViewById(R.id.five), findViewById(R.id.six),
+            findViewById(R.id.seven), findViewById(R.id.eight), findViewById(R.id.nine)
+        )
+        mInfoTextView = findViewById(R.id.information)
+        mHumanScoreView = findViewById(R.id.human_score)
+        mTiesScoreView = findViewById(R.id.ties_score)
+        mComputerScoreView = findViewById(R.id.computer_score)
+
+        mGame = TicTacToeGame()
+
+        startNewGame()
+    }
+
+    // Sets up (or resets) the board for a new game. Alternates who goes
+    // first each time it's called, per the "extra challenge".
+    private fun startNewGame() {
+        mGame.clearBoard()
+        mGameOver = false
+
+        for (i in mBoardButtons.indices) {
+            mBoardButtons[i].text = ""
+            mBoardButtons[i].isEnabled = true
+            mBoardButtons[i].setTextColor(Color.BLACK)
+            mBoardButtons[i].setOnClickListener { onBoardButtonClicked(i) }
+        }
+
+        if (mHumanGoesFirst) {
+            mInfoTextView.setText(R.string.first_human)
+        } else {
+            mInfoTextView.setText(R.string.first_computer)
+            val move = mGame.getComputerMove()
+            setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+            mInfoTextView.setText(R.string.turn_human)
+        }
+        mHumanGoesFirst = !mHumanGoesFirst
+    }
+
+    private fun onBoardButtonClicked(location: Int) {
+        if (mGameOver || !mBoardButtons[location].isEnabled) {
+            return
+        }
+
+        setMove(TicTacToeGame.HUMAN_PLAYER, location)
+
+        var winner = mGame.checkForWinner()
+        if (winner == 0) {
+            mInfoTextView.setText(R.string.turn_computer)
+            val move = mGame.getComputerMove()
+            setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+            winner = mGame.checkForWinner()
+        }
+
+        when (winner) {
+            0 -> mInfoTextView.setText(R.string.turn_human)
+            1 -> {
+                mInfoTextView.setText(R.string.result_tie)
+                mTiesScore++
+                endGame()
+            }
+            2 -> {
+                mInfoTextView.setText(R.string.result_human_wins)
+                mHumanScore++
+                endGame()
+            }
+            else -> {
+                mInfoTextView.setText(R.string.result_computer_wins)
+                mComputerScore++
+                endGame()
+            }
+        }
+    }
+
+    private fun endGame() {
+        mGameOver = true
+        updateScoreDisplay()
+    }
+
+    private fun updateScoreDisplay() {
+        mHumanScoreView.text = getString(R.string.score_human, mHumanScore)
+        mTiesScoreView.text = getString(R.string.score_ties, mTiesScore)
+        mComputerScoreView.text = getString(R.string.score_computer, mComputerScore)
+    }
+
+    // Updates the model, disables the button, and colors X green / O red.
+    private fun setMove(player: Char, location: Int) {
+        mGame.setMove(player, location)
+        val button = mBoardButtons[location]
+        button.isEnabled = false
+        button.text = player.toString()
+        button.setTextColor(
+            if (player == TicTacToeGame.HUMAN_PLAYER) Color.rgb(0, 200, 0)
+            else Color.rgb(200, 0, 0)
+        )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_new_game) {
+            startNewGame()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
