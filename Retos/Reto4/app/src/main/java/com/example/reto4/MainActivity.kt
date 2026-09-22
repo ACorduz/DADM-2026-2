@@ -1,11 +1,16 @@
 package com.example.reto4
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -125,15 +130,75 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
+        menuInflater.inflate(R.menu.options_menu, menu)
         return true
     }
 
+    @Suppress("DEPRECATION")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_new_game) {
-            startNewGame()
-            return true
+        when (item.itemId) {
+            R.id.new_game -> {
+                startNewGame()
+                return true
+            }
+            R.id.ai_difficulty -> {
+                showDialog(DIALOG_DIFFICULTY_ID)
+                return true
+            }
+            R.id.quit -> {
+                showDialog(DIALOG_QUIT_ID)
+                return true
+            }
+            R.id.about -> {
+                showDialog(DIALOG_ABOUT_ID)
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onCreateDialog(id: Int): Dialog? {
+        val builder = AlertDialog.Builder(this)
+
+        when (id) {
+            DIALOG_DIFFICULTY_ID -> {
+                builder.setTitle(R.string.difficulty_choose)
+                val levels: Array<CharSequence> = arrayOf(
+                    getString(R.string.difficulty_easy),
+                    getString(R.string.difficulty_harder),
+                    getString(R.string.difficulty_expert)
+                )
+                val selected = mGame.getDifficultyLevel().ordinal
+                builder.setSingleChoiceItems(levels, selected) { dialog, item ->
+                    dialog.dismiss()
+                    mGame.setDifficultyLevel(TicTacToeGame.DifficultyLevel.values()[item])
+                    Toast.makeText(applicationContext, levels[item], Toast.LENGTH_SHORT).show()
+                }
+                return builder.create()
+            }
+            DIALOG_QUIT_ID -> {
+                builder.setMessage(R.string.quit_question)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.yes) { _, _ -> finish() }
+                    .setNegativeButton(R.string.no, null)
+                return builder.create()
+            }
+            DIALOG_ABOUT_ID -> {
+                val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val layout = inflater.inflate(R.layout.about_dialog, null)
+                builder.setView(layout)
+                builder.setPositiveButton(R.string.about_ok, null)
+                return builder.create()
+            }
+        }
+
+        return super.onCreateDialog(id)
+    }
+
+    companion object {
+        private const val DIALOG_DIFFICULTY_ID = 0
+        private const val DIALOG_QUIT_ID = 1
+        private const val DIALOG_ABOUT_ID = 2
     }
 }
