@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_about"
+        android:src="@mipmap/ic_launcher"
         android:contentDescription="@string/about_title" />
 
     <TextView

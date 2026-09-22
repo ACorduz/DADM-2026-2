@@ -134,6 +134,13 @@ class TicTacToeGameTest {
     }
 
     @Test
+    fun clearBoard_doesNotResetDifficultyLevel() {
+        game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Easy)
+        game.clearBoard()
+        assertEquals(TicTacToeGame.DifficultyLevel.Easy, game.getDifficultyLevel())
+    }
+
+    @Test
     fun getComputerMove_harderLevel_takesTheWinWhenOneIsAvailable() {
         game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Harder)
         game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
