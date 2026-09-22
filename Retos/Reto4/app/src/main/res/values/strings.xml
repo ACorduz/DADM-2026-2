@@ -17,4 +17,21 @@
     <string name="score_computer_default">Android: 0</string>
 
     <string name="menu_new_game">New Game</string>
+    <string name="menu_difficulty">Difficulty</string>
+    <string name="menu_quit">Quit</string>
+    <string name="menu_about">About</string>
+
+    <string name="difficulty_choose">Choose a difficulty level:</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_harder">Harder</string>
+    <string name="difficulty_expert">Expert</string>
+
+    <string name="quit_question">Are you sure you want to quit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="about_title">Tic-Tac-Toe</string>
+    <string name="about_by">By ACorduz</string>
+    <string name="about_description">Choose from one of three difficulty levels. Don\'t let the Android beat you!</string>
+    <string name="about_ok">OK</string>
 </resources>
