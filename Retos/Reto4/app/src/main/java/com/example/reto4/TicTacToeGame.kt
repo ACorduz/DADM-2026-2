@@ -3,15 +3,19 @@ package com.example.reto4
 import kotlin.random.Random
 
 /**
- * Tic-Tac-Toe game model. Owns the board and the computer's AI
- * (win if possible, otherwise block, otherwise pick randomly).
- * All UI concerns live in MainActivity, which only talks to this
- * class through its public methods.
+ * Tic-Tac-Toe game model. Owns the board and the computer's AI, whose
+ * strength depends on the current DifficultyLevel. All UI concerns live
+ * in MainActivity, which only talks to this class through its public
+ * methods.
  */
 class TicTacToeGame {
 
+    /** The computer's difficulty levels. */
+    enum class DifficultyLevel { Easy, Harder, Expert }
+
     private val mBoard = CharArray(BOARD_SIZE) { OPEN_SPOT }
     private val mRand = Random(System.currentTimeMillis())
+    private var mDifficultyLevel: DifficultyLevel = DifficultyLevel.Expert
 
     companion object {
         const val HUMAN_PLAYER = 'X'
@@ -43,12 +47,38 @@ class TicTacToeGame {
         }
     }
 
+    fun getDifficultyLevel(): DifficultyLevel = mDifficultyLevel
+
+    fun setDifficultyLevel(difficultyLevel: DifficultyLevel) {
+        mDifficultyLevel = difficultyLevel
+    }
+
     /**
-     * Returns the best move for the computer to make. You must call
-     * setMove() to actually make the computer move to that location.
+     * Returns the best move for the computer to make, given the current
+     * difficulty level. You must call setMove() to actually make the
+     * computer move to that location.
      */
     fun getComputerMove(): Int {
-        // First see if there's a move O can make to win right now.
+        var move = -1
+
+        if (mDifficultyLevel == DifficultyLevel.Easy) {
+            move = getRandomMove()
+        } else if (mDifficultyLevel == DifficultyLevel.Harder) {
+            move = getWinningMove()
+            if (move == -1) move = getRandomMove()
+        } else if (mDifficultyLevel == DifficultyLevel.Expert) {
+            // Try to win, but if that's not possible, block.
+            // If that's not possible, move anywhere.
+            move = getWinningMove()
+            if (move == -1) move = getBlockingMove()
+            if (move == -1) move = getRandomMove()
+        }
+
+        return move
+    }
+
+    /** Returns a move that lets the computer win immediately, or -1 if none exists. */
+    private fun getWinningMove(): Int {
         for (i in 0 until BOARD_SIZE) {
             if (mBoard[i] == OPEN_SPOT) {
                 val current = mBoard[i]
@@ -58,7 +88,11 @@ class TicTacToeGame {
                 if (winner == 3) return i
             }
         }
-        // Otherwise, see if the human could win on their next move, and block them.
+        return -1
+    }
+
+    /** Returns a move that blocks the human from winning next turn, or -1 if none is needed. */
+    private fun getBlockingMove(): Int {
         for (i in 0 until BOARD_SIZE) {
             if (mBoard[i] == OPEN_SPOT) {
                 val current = mBoard[i]
@@ -68,7 +102,11 @@ class TicTacToeGame {
                 if (winner == 2) return i
             }
         }
-        // Otherwise, pick a random open spot.
+        return -1
+    }
+
+    /** Returns a random open location on the board. */
+    private fun getRandomMove(): Int {
         var move: Int
         do {
             move = mRand.nextInt(BOARD_SIZE)

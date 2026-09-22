@@ -121,4 +121,71 @@ class TicTacToeGameTest {
         assertTrue(move in 0 until TicTacToeGame.BOARD_SIZE)
         assertEquals(TicTacToeGame.OPEN_SPOT, game.boardCell(move))
     }
+
+    @Test
+    fun difficultyLevel_defaultsToExpert() {
+        assertEquals(TicTacToeGame.DifficultyLevel.Expert, game.getDifficultyLevel())
+    }
+
+    @Test
+    fun setDifficultyLevel_changesGetDifficultyLevel() {
+        game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Easy)
+        assertEquals(TicTacToeGame.DifficultyLevel.Easy, game.getDifficultyLevel())
+    }
+
+    @Test
+    fun getComputerMove_harderLevel_takesTheWinWhenOneIsAvailable() {
+        game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Harder)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 1)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 3)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
+        assertEquals(2, game.getComputerMove())
+    }
+
+    @Test
+    fun getComputerMove_harderLevel_doesNotAlwaysBlock() {
+        game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Harder)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 1)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 5)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 6)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 3)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 4)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 7)
+        // Open cells: 2 (blocks X's row 0-1-2) and 8 (doesn't). Harder never
+        // calls getBlockingMove(), so across many trials it must sometimes
+        // land on 8 via the random fallback.
+        var sawNonBlockingMove = false
+        for (i in 0 until 30) {
+            if (game.getComputerMove() == 8) {
+                sawNonBlockingMove = true
+                break
+            }
+        }
+        assertTrue(sawNonBlockingMove)
+    }
+
+    @Test
+    fun getComputerMove_easyLevel_doesNotAlwaysTakeAvailableWin() {
+        game.setDifficultyLevel(TicTacToeGame.DifficultyLevel.Easy)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 1)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 5)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 6)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 3)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 7)
+        // Open cells: 2 (wins for O via row 0-1-2) and 8 (doesn't). Easy
+        // never calls getWinningMove(), so across many trials it must
+        // sometimes land on 8 via the random fallback.
+        var sawNonWinningMove = false
+        for (i in 0 until 30) {
+            if (game.getComputerMove() == 8) {
+                sawNonWinningMove = true
+                break
+            }
+        }
+        assertTrue(sawNonWinningMove)
+    }
 }
