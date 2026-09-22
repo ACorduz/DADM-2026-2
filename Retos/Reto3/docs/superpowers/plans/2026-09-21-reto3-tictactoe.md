@@ -846,7 +846,7 @@ Open the project in Android Studio, run on an emulator, and confirm:
 - [ ] Tapping an empty button places a green X, disables that button, then the computer places a red O.
 - [ ] Playing a game to a human win shows "You won!", the human score increments, and all buttons become unresponsive.
 - [ ] Playing a game to a tie shows "It's a tie." and the ties score increments.
-- [ ] Opening the overflow menu shows "New Game"; tapping it clears the board **and** the second game starts with the computer moving first (status briefly shows "Android goes first." then "Your turn." with one O already on the board) — confirming the alternating-starter extra challenge.
+- [ ] The "New Game" item appears in the ActionBar (or in the overflow menu, if the screen is narrow); tapping it clears the board **and** the second game starts with the computer moving first (status shows "Android went first. Your turn." with one O already on the board) — confirming the alternating-starter extra challenge.
 - [ ] Playing several games shows the Human/Ties/Android counters at the bottom accumulating correctly and never resetting between games (only the board resets).
 
 - [ ] **Step 5: Commit**

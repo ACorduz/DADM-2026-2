@@ -59,10 +59,9 @@ class MainActivity : AppCompatActivity() {
         if (mHumanGoesFirst) {
             mInfoTextView.setText(R.string.first_human)
         } else {
-            mInfoTextView.setText(R.string.first_computer)
             val move = mGame.getComputerMove()
             setMove(TicTacToeGame.COMPUTER_PLAYER, move)
-            mInfoTextView.setText(R.string.turn_human)
+            mInfoTextView.setText(R.string.first_computer)
         }
         mHumanGoesFirst = !mHumanGoesFirst
     }

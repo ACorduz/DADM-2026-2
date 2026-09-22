@@ -22,6 +22,16 @@ class TicTacToeGameTest {
     }
 
     @Test
+    fun clearBoard_resetsOccupiedCellsBackToOpenSpot() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 4)
+        game.clearBoard()
+        for (i in 0 until TicTacToeGame.BOARD_SIZE) {
+            assertEquals(TicTacToeGame.OPEN_SPOT, game.boardCell(i))
+        }
+    }
+
+    @Test
     fun setMove_placesPlayerAtOpenLocation() {
         game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
         assertEquals(TicTacToeGame.HUMAN_PLAYER, game.boardCell(4))
@@ -53,6 +63,22 @@ class TicTacToeGameTest {
     fun checkForWinner_returnsThree_whenComputerCompletesAColumn() {
         game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
         game.setMove(TicTacToeGame.COMPUTER_PLAYER, 3)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 6)
+        assertEquals(3, game.checkForWinner())
+    }
+
+    @Test
+    fun checkForWinner_returnsTwo_whenHumanCompletesTopLeftToBottomRightDiagonal() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 8)
+        assertEquals(2, game.checkForWinner())
+    }
+
+    @Test
+    fun checkForWinner_returnsThree_whenComputerCompletesTopRightToBottomLeftDiagonal() {
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 2)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 4)
         game.setMove(TicTacToeGame.COMPUTER_PLAYER, 6)
         assertEquals(3, game.checkForWinner())
     }
