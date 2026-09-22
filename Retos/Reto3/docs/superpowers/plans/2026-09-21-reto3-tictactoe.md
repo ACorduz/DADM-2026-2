@@ -1,0 +1,857 @@
+# Reto3 Tic-Tac-Toe Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Build a working Kotlin/Views Android Tic-Tac-Toe app in `Retos/Reto3` per the McCown PDF tutorial, including the "alternate who starts + score counters" extra challenge.
+
+**Architecture:** Classic Android Views project (no Compose). `TicTacToeGame.kt` holds all game logic (board, AI, win detection) behind four public methods; `MainActivity.kt` holds all UI/event handling and talks to `TicTacToeGame` only through that public API. Gradle project skeleton is cloned from the sibling `Retos/Reto0` project (already known to build on this machine) and renamed to `com.example.reto3`.
+
+**Tech Stack:** Kotlin, AndroidX AppCompat + Material Components (no Jetpack Compose), Gradle Kotlin DSL, JUnit4 for unit tests, AGP/Gradle versions matching `Retos/Reto0`.
+
+**Spec:** `docs/superpowers/specs/2026-09-21-reto3-tictactoe-design.md`
+
+## Global Constraints
+
+- `compileSdk 37`, `minSdk 24`, `targetSdk 37` (matches the installed SDK platform `android-37.0` and `Reto0`).
+- Kotlin + classic Android Views/XML only — no Jetpack Compose.
+- `namespace`/`applicationId` = `com.example.reto3`; activity class name = `MainActivity` (not the PDF's `AndroidTicTacToeActivity`, to match this repo's convention).
+- `TicTacToeGame`'s public surface is exactly: `clearBoard()`, `setMove(player: Char, location: Int)`, `getComputerMove(): Int`, `checkForWinner(): Int`, plus one `internal` (module-visible only) `boardCell(location: Int): Char` added solely so unit tests can observe board state without widening the public API. Every other member is `private`.
+- `checkForWinner()` codes: `0` = game in progress, `1` = tie, `2` = human (`X`) won, `3` = computer (`O`) won.
+- Constants: `HUMAN_PLAYER = 'X'`, `COMPUTER_PLAYER = 'O'`, `OPEN_SPOT = ' '`, `BOARD_SIZE = 9`.
+- Extra challenge is in scope: alternate who goes first each new game; track and display human/tie/computer win counts via a `RelativeLayout` row of `TextView`s.
+- No Android SDK-based instrumented/UI tests in this pass — verification is `./gradlew.bat assembleDebug` (compiles) plus `./gradlew.bat testDebugUnitTest` (pure-JVM unit tests for `TicTacToeGame`) run locally, and a manual checklist for the user to run in Android Studio's emulator for interactive behavior.
+- Local Android SDK is at `C:\Users\Karol\AppData\Local\Android\Sdk` (platform `android-37.0`, build-tools `36.0.0` installed) — this is what `local.properties` must point to for the build to run in this environment.
+
+---
+
+### Task 1: Project scaffold (Gradle + manifest + resources), builds clean
+
+**Files:**
+- Create: `Retos/Reto3/settings.gradle.kts`
+- Create: `Retos/Reto3/build.gradle.kts`
+- Create: `Retos/Reto3/gradle.properties`
+- Create: `Retos/Reto3/.gitignore`
+- Create: `Retos/Reto3/local.properties`
+- Create: `Retos/Reto3/gradlew`, `Retos/Reto3/gradlew.bat`
+- Create: `Retos/Reto3/gradle/wrapper/gradle-wrapper.jar`, `Retos/Reto3/gradle/wrapper/gradle-wrapper.properties`
+- Create: `Retos/Reto3/gradle/libs.versions.toml`
+- Create: `Retos/Reto3/app/build.gradle.kts`
+- Create: `Retos/Reto3/app/.gitignore`
+- Create: `Retos/Reto3/app/src/main/AndroidManifest.xml`
+- Create: `Retos/Reto3/app/src/main/res/**` (icons, `xml/backup_rules.xml`, `xml/data_extraction_rules.xml`, `values/colors.xml`, `values/themes.xml`, `values-night/themes.xml`, `values/strings.xml`)
+- Create: `Retos/Reto3/app/src/main/java/com/example/reto3/MainActivity.kt` (placeholder, rewritten fully in Task 5)
+
+**Interfaces:**
+- Produces: a buildable Gradle project with namespace `com.example.reto3`, `Theme.Reto3` (ActionBar-enabled, needed later for the options menu in Task 5), and `MainActivity` as the launcher activity. Later tasks add files under this same `app/src/main/...` tree without touching build config again.
+
+- [ ] **Step 1: Copy the known-working Gradle wrapper and root build files from `Reto0`**
+
+```bash
+cd "/d/Escritorio/DADM-2026-2/Retos/Reto3"
+cp "../Reto0/settings.gradle.kts" .
+cp "../Reto0/build.gradle.kts" .
+cp "../Reto0/gradle.properties" .
+cp "../Reto0/.gitignore" .
+mkdir -p gradle/wrapper
+cp "../Reto0/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/
+cp "../Reto0/gradle/wrapper/gradle-wrapper.properties" gradle/wrapper/
+cp "../Reto0/gradlew" .
+cp "../Reto0/gradlew.bat" .
+cp "../Reto0/gradle/libs.versions.toml" gradle/libs.versions.toml
+chmod +x gradlew
+```
+
+- [ ] **Step 2: Set `rootProject.name` to `Reto3`**
+
+In `Retos/Reto3/settings.gradle.kts`, change the last two lines to:
+
+```kotlin
+rootProject.name = "Reto3"
+include(":app")
+```
+
+- [ ] **Step 3: Point `local.properties` at the installed SDK**
+
+Create `Retos/Reto3/local.properties`:
+
+```properties
+## This file is automatically generated by Android Studio.
+# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
+sdk.dir=C\:\\Users\\Karol\\AppData\\Local\\Android\\Sdk
+```
+
+- [ ] **Step 4: Create `app/build.gradle.kts`**
+
+```kotlin
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace = "com.example.reto3"
+    compileSdk {
+        version = release(37)
+    }
+
+    defaultConfig {
+        applicationId = "com.example.reto3"
+        minSdk = 24
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            optimization {
+                enable = false
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+}
+```
+
+- [ ] **Step 5: Create `app/.gitignore`**
+
+```
+/build
+```
+
+- [ ] **Step 6: Create `app/src/main/AndroidManifest.xml`**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Reto3">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
+```
+
+- [ ] **Step 7: Copy icon/boilerplate resources from `Reto0`, then overwrite the app-specific ones**
+
+```bash
+cd "/d/Escritorio/DADM-2026-2/Retos/Reto3"
+mkdir -p app/src/main/res
+cp -r "../Reto0/app/src/main/res/drawable" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-anydpi-v26" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-hdpi" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-mdpi" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-xhdpi" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-xxhdpi" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/mipmap-xxxhdpi" app/src/main/res/
+cp -r "../Reto0/app/src/main/res/xml" app/src/main/res/
+mkdir -p app/src/main/res/values app/src/main/res/values-night
+cp "../Reto0/app/src/main/res/values/colors.xml" app/src/main/res/values/colors.xml
+```
+
+- [ ] **Step 8: Create `app/src/main/res/values/themes.xml` (ActionBar enabled — needed for the options menu in Task 5)**
+
+```xml
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Reto3" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+</resources>
+```
+
+- [ ] **Step 9: Create `app/src/main/res/values-night/themes.xml`**
+
+```xml
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Reto3" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+</resources>
+```
+
+- [ ] **Step 10: Create `app/src/main/res/values/strings.xml` (final app name now; game strings added in Task 4)**
+
+```xml
+<resources>
+    <string name="app_name">Tic-Tac-Toe</string>
+</resources>
+```
+
+- [ ] **Step 11: Create a placeholder `MainActivity.kt`**
+
+```kotlin
+package com.example.reto3
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+}
+```
+
+- [ ] **Step 12: Build to verify the scaffold compiles**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat assembleDebug`
+Expected: `BUILD SUCCESSFUL`. If it fails on a missing SDK license, run `./gradlew.bat assembleDebug` again after accepting licenses in Android Studio's SDK Manager, or `"C:\Users\Karol\AppData\Local\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat" --licenses` if available.
+
+- [ ] **Step 13: Commit**
+
+```bash
+git -C "/d/Escritorio/DADM-2026-2" add Retos/Reto3
+git -C "/d/Escritorio/DADM-2026-2" commit -m "Reto3: scaffold Tic-Tac-Toe Android project"
+```
+
+---
+
+### Task 2: `TicTacToeGame` model, with unit tests (TDD)
+
+**Files:**
+- Create: `Retos/Reto3/app/src/main/java/com/example/reto3/TicTacToeGame.kt`
+- Test: `Retos/Reto3/app/src/test/java/com/example/reto3/TicTacToeGameTest.kt`
+
+**Interfaces:**
+- Consumes: nothing (pure Kotlin, no Android framework dependency).
+- Produces: `TicTacToeGame` class with public methods `clearBoard()`, `setMove(player: Char, location: Int)`, `getComputerMove(): Int`, `checkForWinner(): Int`, companion constants `HUMAN_PLAYER`, `COMPUTER_PLAYER`, `OPEN_SPOT`, `BOARD_SIZE`, and `internal fun boardCell(location: Int): Char` — this is what `MainActivity.kt` (Task 5) and the tests below depend on.
+
+- [ ] **Step 1: Write the failing tests**
+
+Create `Retos/Reto3/app/src/test/java/com/example/reto3/TicTacToeGameTest.kt`:
+
+```kotlin
+package com.example.reto3
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+class TicTacToeGameTest {
+
+    private lateinit var game: TicTacToeGame
+
+    @Before
+    fun setUp() {
+        game = TicTacToeGame()
+    }
+
+    @Test
+    fun clearBoard_setsEveryCellToOpenSpot() {
+        for (i in 0 until TicTacToeGame.BOARD_SIZE) {
+            assertEquals(TicTacToeGame.OPEN_SPOT, game.boardCell(i))
+        }
+    }
+
+    @Test
+    fun setMove_placesPlayerAtOpenLocation() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
+        assertEquals(TicTacToeGame.HUMAN_PLAYER, game.boardCell(4))
+    }
+
+    @Test
+    fun setMove_doesNotOverwriteOccupiedLocation() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
+        assertEquals(TicTacToeGame.HUMAN_PLAYER, game.boardCell(0))
+    }
+
+    @Test
+    fun checkForWinner_returnsZero_whenGameInProgress() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 1)
+        assertEquals(0, game.checkForWinner())
+    }
+
+    @Test
+    fun checkForWinner_returnsTwo_whenHumanCompletesARow() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 1)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 2)
+        assertEquals(2, game.checkForWinner())
+    }
+
+    @Test
+    fun checkForWinner_returnsThree_whenComputerCompletesAColumn() {
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 3)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 6)
+        assertEquals(3, game.checkForWinner())
+    }
+
+    @Test
+    fun checkForWinner_returnsOne_whenBoardIsFullWithNoWinner() {
+        // X | O | X
+        // X | O | O
+        // O | X | X
+        val xMoves = intArrayOf(0, 2, 3, 7, 8)
+        val oMoves = intArrayOf(1, 4, 5, 6)
+        for (loc in xMoves) game.setMove(TicTacToeGame.HUMAN_PLAYER, loc)
+        for (loc in oMoves) game.setMove(TicTacToeGame.COMPUTER_PLAYER, loc)
+        assertEquals(1, game.checkForWinner())
+    }
+
+    @Test
+    fun getComputerMove_takesTheWinWhenOneIsAvailable() {
+        // O has two in a row (0,1); should take 2 to win.
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 0)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 1)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 3)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 4)
+        assertEquals(2, game.getComputerMove())
+    }
+
+    @Test
+    fun getComputerMove_blocksTheHumanWhenAboutToWin() {
+        // X has two in a row (0,1) and would win at 2; O must block.
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 1)
+        game.setMove(TicTacToeGame.COMPUTER_PLAYER, 6)
+        assertEquals(2, game.getComputerMove())
+    }
+
+    @Test
+    fun getComputerMove_returnsAnOpenLocation_whenNoWinOrBlockAvailable() {
+        game.setMove(TicTacToeGame.HUMAN_PLAYER, 0)
+        val move = game.getComputerMove()
+        assertTrue(move in 0 until TicTacToeGame.BOARD_SIZE)
+        assertEquals(TicTacToeGame.OPEN_SPOT, game.boardCell(move))
+    }
+}
+```
+
+- [ ] **Step 2: Run the tests to verify they fail (class doesn't exist yet)**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat testDebugUnitTest --tests "com.example.reto3.TicTacToeGameTest"`
+Expected: FAIL — compile error, `TicTacToeGame` unresolved reference.
+
+- [ ] **Step 3: Implement `TicTacToeGame.kt`**
+
+Create `Retos/Reto3/app/src/main/java/com/example/reto3/TicTacToeGame.kt`:
+
+```kotlin
+package com.example.reto3
+
+import kotlin.random.Random
+
+/**
+ * Tic-Tac-Toe game model. Owns the board and the computer's AI
+ * (win if possible, otherwise block, otherwise pick randomly).
+ * All UI concerns live in MainActivity, which only talks to this
+ * class through its public methods.
+ */
+class TicTacToeGame {
+
+    private val mBoard = CharArray(BOARD_SIZE) { OPEN_SPOT }
+    private val mRand = Random(System.currentTimeMillis())
+
+    companion object {
+        const val HUMAN_PLAYER = 'X'
+        const val COMPUTER_PLAYER = 'O'
+        const val OPEN_SPOT = ' '
+        const val BOARD_SIZE = 9
+
+        private val WIN_COMBOS = arrayOf(
+            intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
+            intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
+            intArrayOf(0, 4, 8), intArrayOf(2, 4, 6)
+        )
+    }
+
+    /** Clears the board of all X's and O's by setting all spots to OPEN_SPOT. */
+    fun clearBoard() {
+        for (i in 0 until BOARD_SIZE) {
+            mBoard[i] = OPEN_SPOT
+        }
+    }
+
+    /**
+     * Sets the given player at the given location on the game board.
+     * The location must be available, or the board will not be changed.
+     */
+    fun setMove(player: Char, location: Int) {
+        if (mBoard[location] == OPEN_SPOT) {
+            mBoard[location] = player
+        }
+    }
+
+    /**
+     * Returns the best move for the computer to make. You must call
+     * setMove() to actually make the computer move to that location.
+     */
+    fun getComputerMove(): Int {
+        // First see if there's a move O can make to win right now.
+        for (i in 0 until BOARD_SIZE) {
+            if (mBoard[i] == OPEN_SPOT) {
+                val current = mBoard[i]
+                mBoard[i] = COMPUTER_PLAYER
+                val winner = checkForWinner()
+                mBoard[i] = current
+                if (winner == 3) return i
+            }
+        }
+        // Otherwise, see if the human could win on their next move, and block them.
+        for (i in 0 until BOARD_SIZE) {
+            if (mBoard[i] == OPEN_SPOT) {
+                val current = mBoard[i]
+                mBoard[i] = HUMAN_PLAYER
+                val winner = checkForWinner()
+                mBoard[i] = current
+                if (winner == 2) return i
+            }
+        }
+        // Otherwise, pick a random open spot.
+        var move: Int
+        do {
+            move = mRand.nextInt(BOARD_SIZE)
+        } while (mBoard[move] != OPEN_SPOT)
+        return move
+    }
+
+    /**
+     * Checks for a winner and returns a status value indicating who has won.
+     * @return 0 if no winner or tie yet, 1 if it's a tie, 2 if X won, or 3 if O won.
+     */
+    fun checkForWinner(): Int {
+        for (combo in WIN_COMBOS) {
+            val (a, b, c) = Triple(combo[0], combo[1], combo[2])
+            if (mBoard[a] == HUMAN_PLAYER && mBoard[b] == HUMAN_PLAYER && mBoard[c] == HUMAN_PLAYER) {
+                return 2
+            }
+            if (mBoard[a] == COMPUTER_PLAYER && mBoard[b] == COMPUTER_PLAYER && mBoard[c] == COMPUTER_PLAYER) {
+                return 3
+            }
+        }
+        for (i in 0 until BOARD_SIZE) {
+            if (mBoard[i] == OPEN_SPOT) return 0
+        }
+        return 1
+    }
+
+    /** Test-only accessor; not part of the public game API. */
+    internal fun boardCell(location: Int): Char = mBoard[location]
+}
+```
+
+- [ ] **Step 4: Run the tests to verify they pass**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat testDebugUnitTest --tests "com.example.reto3.TicTacToeGameTest"`
+Expected: PASS — all 10 tests green.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git -C "/d/Escritorio/DADM-2026-2" add Retos/Reto3/app/src/main/java/com/example/reto3/TicTacToeGame.kt Retos/Reto3/app/src/test/java/com/example/reto3/TicTacToeGameTest.kt
+git -C "/d/Escritorio/DADM-2026-2" commit -m "Reto3: implement TicTacToeGame model with unit tests"
+```
+
+---
+
+### Task 3: Board layout XML (9 buttons + status + score row)
+
+**Files:**
+- Create: `Retos/Reto3/app/src/main/res/layout/activity_main.xml`
+
+**Interfaces:**
+- Produces: view IDs that Task 5's `MainActivity.kt` binds via `findViewById`: `one`..`nine` (the 9 board `Button`s), `information` (status `TextView`), `human_score`, `ties_score`, `computer_score` (score `TextView`s).
+
+- [ ] **Step 1: Create the layout**
+
+Create `Retos/Reto3/app/src/main/res/layout/activity_main.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+    <TableLayout
+        android:id="@+id/play_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+
+        <TableRow android:gravity="center_horizontal">
+            <Button android:id="@+id/one" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/two" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/three" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+        </TableRow>
+
+        <TableRow android:gravity="center_horizontal">
+            <Button android:id="@+id/four" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/five" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/six" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+        </TableRow>
+
+        <TableRow android:gravity="center_horizontal">
+            <Button android:id="@+id/seven" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/eight" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+            <Button android:id="@+id/nine" android:layout_width="100dp"
+                android:layout_height="100dp" android:text="" android:textSize="70dp" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/information"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/first_human"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/ties_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="18sp"
+            android:text="@string/score_ties_default" />
+
+        <TextView
+            android:id="@+id/human_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/ties_score"
+            android:layout_alignBaseline="@id/ties_score"
+            android:layout_marginEnd="24dp"
+            android:textSize="18sp"
+            android:text="@string/score_human_default" />
+
+        <TextView
+            android:id="@+id/computer_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/ties_score"
+            android:layout_alignBaseline="@id/ties_score"
+            android:layout_marginStart="24dp"
+            android:textSize="18sp"
+            android:text="@string/score_computer_default" />
+    </RelativeLayout>
+
+</LinearLayout>
+```
+
+- [ ] **Step 2: Verify resources compile**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat assembleDebug`
+Expected: FAILS at this point — `@string/first_human`, `@string/score_ties_default`, `@string/score_human_default`, `@string/score_computer_default` don't exist yet. That's expected; Task 4 adds them. Confirm the failure is specifically "resource not found" for those four names and nothing else (i.e. the layout's structure/attributes are otherwise valid).
+
+- [ ] **Step 3: Commit**
+
+```bash
+git -C "/d/Escritorio/DADM-2026-2" add Retos/Reto3/app/src/main/res/layout/activity_main.xml
+git -C "/d/Escritorio/DADM-2026-2" commit -m "Reto3: add Tic-Tac-Toe board layout"
+```
+
+---
+
+### Task 4: Strings and the "New Game" menu resource
+
+**Files:**
+- Modify: `Retos/Reto3/app/src/main/res/values/strings.xml`
+- Create: `Retos/Reto3/app/src/main/res/menu/main_menu.xml`
+
+**Interfaces:**
+- Produces: string resources `first_human`, `first_computer`, `turn_human`, `turn_computer`, `result_tie`, `result_human_wins`, `result_computer_wins`, `score_human` / `score_ties` / `score_computer` (each `%1$d` format strings), `score_human_default` / `score_ties_default` / `score_computer_default` (static "…: 0" literals for the layout's initial state), `menu_new_game`; and menu item id `R.id.action_new_game` — all consumed by Task 5's `MainActivity.kt`.
+
+- [ ] **Step 1: Replace `strings.xml` with the full set of messages**
+
+Replace the contents of `Retos/Reto3/app/src/main/res/values/strings.xml`:
+
+```xml
+<resources>
+    <string name="app_name">Tic-Tac-Toe</string>
+
+    <string name="first_human">You go first.</string>
+    <string name="first_computer">Android goes first.</string>
+    <string name="turn_human">Your turn.</string>
+    <string name="turn_computer">Android\'s turn.</string>
+    <string name="result_tie">It\'s a tie.</string>
+    <string name="result_human_wins">You won!</string>
+    <string name="result_computer_wins">Android won!</string>
+
+    <string name="score_human">Human: %1$d</string>
+    <string name="score_ties">Ties: %1$d</string>
+    <string name="score_computer">Android: %1$d</string>
+    <string name="score_human_default">Human: 0</string>
+    <string name="score_ties_default">Ties: 0</string>
+    <string name="score_computer_default">Android: 0</string>
+
+    <string name="menu_new_game">New Game</string>
+</resources>
+```
+
+- [ ] **Step 2: Create the options menu**
+
+Create `Retos/Reto3/app/src/main/res/menu/main_menu.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_new_game"
+        android:title="@string/menu_new_game"
+        android:showAsAction="ifRoom" />
+</menu>
+```
+
+- [ ] **Step 3: Verify resources compile**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat assembleDebug`
+Expected: `BUILD SUCCESSFUL` (the placeholder `MainActivity` from Task 1 doesn't reference the new layout/menu yet, so nothing exercises them at runtime, but everything must compile).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git -C "/d/Escritorio/DADM-2026-2" add Retos/Reto3/app/src/main/res/values/strings.xml Retos/Reto3/app/src/main/res/menu/main_menu.xml
+git -C "/d/Escritorio/DADM-2026-2" commit -m "Reto3: add game strings and New Game menu"
+```
+
+---
+
+### Task 5: Wire up `MainActivity` — full game loop, extra challenge, verification
+
+**Files:**
+- Modify: `Retos/Reto3/app/src/main/java/com/example/reto3/MainActivity.kt`
+
+**Interfaces:**
+- Consumes: `TicTacToeGame` public API from Task 2 (`clearBoard()`, `setMove(Char, Int)`, `getComputerMove(): Int`, `checkForWinner(): Int`, constants `HUMAN_PLAYER`/`COMPUTER_PLAYER`); view IDs from Task 3 (`one`..`nine`, `information`, `human_score`, `ties_score`, `computer_score`); string/menu resources from Task 4 (`R.string.*`, `R.menu.main_menu`, `R.id.action_new_game`).
+- Produces: the finished app — nothing downstream depends on this file.
+
+- [ ] **Step 1: Replace `MainActivity.kt`**
+
+Replace the contents of `Retos/Reto3/app/src/main/java/com/example/reto3/MainActivity.kt`:
+
+```kotlin
+package com.example.reto3
+
+import android.graphics.Color
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var mGame: TicTacToeGame
+    private lateinit var mBoardButtons: Array<Button>
+    private lateinit var mInfoTextView: TextView
+    private lateinit var mHumanScoreView: TextView
+    private lateinit var mTiesScoreView: TextView
+    private lateinit var mComputerScoreView: TextView
+
+    private var mGameOver = false
+    private var mHumanGoesFirst = true
+
+    private var mHumanScore = 0
+    private var mTiesScore = 0
+    private var mComputerScore = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        mBoardButtons = arrayOf(
+            findViewById(R.id.one), findViewById(R.id.two), findViewById(R.id.three),
+            findViewById(R.id.four), findViewById(R.id.five), findViewById(R.id.six),
+            findViewById(R.id.seven), findViewById(R.id.eight), findViewById(R.id.nine)
+        )
+        mInfoTextView = findViewById(R.id.information)
+        mHumanScoreView = findViewById(R.id.human_score)
+        mTiesScoreView = findViewById(R.id.ties_score)
+        mComputerScoreView = findViewById(R.id.computer_score)
+
+        mGame = TicTacToeGame()
+
+        startNewGame()
+    }
+
+    // Sets up (or resets) the board for a new game. Alternates who goes
+    // first each time it's called, per the "extra challenge".
+    private fun startNewGame() {
+        mGame.clearBoard()
+        mGameOver = false
+
+        for (i in mBoardButtons.indices) {
+            mBoardButtons[i].text = ""
+            mBoardButtons[i].isEnabled = true
+            mBoardButtons[i].setTextColor(Color.BLACK)
+            mBoardButtons[i].setOnClickListener { onBoardButtonClicked(i) }
+        }
+
+        if (mHumanGoesFirst) {
+            mInfoTextView.setText(R.string.first_human)
+        } else {
+            mInfoTextView.setText(R.string.first_computer)
+            val move = mGame.getComputerMove()
+            setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+            mInfoTextView.setText(R.string.turn_human)
+        }
+        mHumanGoesFirst = !mHumanGoesFirst
+    }
+
+    private fun onBoardButtonClicked(location: Int) {
+        if (mGameOver || !mBoardButtons[location].isEnabled) {
+            return
+        }
+
+        setMove(TicTacToeGame.HUMAN_PLAYER, location)
+
+        var winner = mGame.checkForWinner()
+        if (winner == 0) {
+            mInfoTextView.setText(R.string.turn_computer)
+            val move = mGame.getComputerMove()
+            setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+            winner = mGame.checkForWinner()
+        }
+
+        when (winner) {
+            0 -> mInfoTextView.setText(R.string.turn_human)
+            1 -> {
+                mInfoTextView.setText(R.string.result_tie)
+                mTiesScore++
+                endGame()
+            }
+            2 -> {
+                mInfoTextView.setText(R.string.result_human_wins)
+                mHumanScore++
+                endGame()
+            }
+            else -> {
+                mInfoTextView.setText(R.string.result_computer_wins)
+                mComputerScore++
+                endGame()
+            }
+        }
+    }
+
+    private fun endGame() {
+        mGameOver = true
+        updateScoreDisplay()
+    }
+
+    private fun updateScoreDisplay() {
+        mHumanScoreView.text = getString(R.string.score_human, mHumanScore)
+        mTiesScoreView.text = getString(R.string.score_ties, mTiesScore)
+        mComputerScoreView.text = getString(R.string.score_computer, mComputerScore)
+    }
+
+    // Updates the model, disables the button, and colors X green / O red.
+    private fun setMove(player: Char, location: Int) {
+        mGame.setMove(player, location)
+        val button = mBoardButtons[location]
+        button.isEnabled = false
+        button.text = player.toString()
+        button.setTextColor(
+            if (player == TicTacToeGame.HUMAN_PLAYER) Color.rgb(0, 200, 0)
+            else Color.rgb(200, 0, 0)
+        )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_new_game) {
+            startNewGame()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+}
+```
+
+- [ ] **Step 2: Build the full app**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat assembleDebug`
+Expected: `BUILD SUCCESSFUL`.
+
+- [ ] **Step 3: Re-run the unit tests (make sure nothing broke the model)**
+
+Run: `cd "/d/Escritorio/DADM-2026-2/Retos/Reto3" && ./gradlew.bat testDebugUnitTest`
+Expected: PASS — all `TicTacToeGameTest` tests still green.
+
+- [ ] **Step 4: Manual verification checklist (requires Android Studio / an emulator or device — not runnable from this environment)**
+
+Open the project in Android Studio, run on an emulator, and confirm:
+- [ ] The board shows 9 empty buttons, status text says "You go first." (first launch).
+- [ ] Tapping an empty button places a green X, disables that button, then the computer places a red O.
+- [ ] Playing a game to a human win shows "You won!", the human score increments, and all buttons become unresponsive.
+- [ ] Playing a game to a tie shows "It's a tie." and the ties score increments.
+- [ ] Opening the overflow menu shows "New Game"; tapping it clears the board **and** the second game starts with the computer moving first (status briefly shows "Android goes first." then "Your turn." with one O already on the board) — confirming the alternating-starter extra challenge.
+- [ ] Playing several games shows the Human/Ties/Android counters at the bottom accumulating correctly and never resetting between games (only the board resets).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git -C "/d/Escritorio/DADM-2026-2" add Retos/Reto3/app/src/main/java/com/example/reto3/MainActivity.kt
+git -C "/d/Escritorio/DADM-2026-2" commit -m "Reto3: wire up MainActivity game loop, menu, and score tracking"
+```
