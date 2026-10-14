@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Firebase config (not versioned; see the Reto7 spec, section 3)
+app/google-services.json
+app/src/main/res/values/google_services.xml

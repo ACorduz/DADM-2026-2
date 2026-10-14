@@ -86,8 +86,9 @@ Copiar `Retos/Reto6` a `Retos/Reto7` (sin `build/`, `.gradle/`, `.idea/`,
 
 ### 2. Integración con Firebase (Gradle)
 
-- `gradle/libs.versions.toml`: agregar `firebase-bom` (última versión
-  estable al implementar), `firebase-database`, `firebase-auth` (módulos
+- `gradle/libs.versions.toml`: agregar `firebase-bom` **34.19.0** (la
+  serie 35.x está compilada con Kotlin 2.4 y el Kotlin integrado de AGP
+  9.3.2 es 2.2, que no puede leer esos metadatos), `firebase-database`, `firebase-auth` (módulos
   principales, sin `-ktx`) y el plugin `com.google.gms.google-services`
   (última versión estable).
 - `build.gradle.kts` raíz: `alias(libs.plugins.google.services) apply false`.
@@ -398,8 +399,10 @@ ronda. Menú: "Leave game", "About".
 
 ## Riesgos
 
-- **Plugin `google-services` vs AGP 9.3.2:** se verifica en la sección 2;
-  si falla, Plan B.
+- **Plugin `google-services` vs AGP 9.3.2:** verificado: el plugin 4.5.0
+  funciona con AGP 9.3.2 (no se necesita el Plan B).
+- **Versión de Kotlin de Firebase:** subir el BoM a 35.x exige subir el
+  Kotlin del proyecto a 2.4; mientras tanto se queda en 34.19.0.
 - **Latencia de `onDisconnect`:** si se pierde la red sin cerrar el socket,
   Firebase puede tardar hasta ~1 minuto en detectarlo; el aviso al rival
   llega con ese retraso. Es aceptable.

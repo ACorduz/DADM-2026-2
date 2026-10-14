@@ -6,7 +6,7 @@
 
 **Architecture:** Clon de Reto6 renombrado a `com.example.reto7`; Firebase BoM + `firebase-database` + `firebase-auth` vía version catalog; plugin `com.google.gms.google-services` (o Plan B del spec si no es compatible con AGP 9.3.2). El setup en la consola de Firebase lo hace el usuario.
 
-**Tech Stack:** Kotlin, Android Views, AGP 9.3.2, Gradle version catalog, Firebase BoM 35.0.1, plugin google-services 4.5.0.
+**Tech Stack:** Kotlin, Android Views, AGP 9.3.2, Gradle version catalog, Firebase BoM 34.19.0 (35.x requiere Kotlin 2.4; el Kotlin integrado de AGP 9.3.2 es 2.2), plugin google-services 4.5.0.
 
 **Spec:** `Retos/Reto7/docs/superpowers/specs/2026-10-14-reto7-triqui-online-design.md` (secciones 1, 2 y 3)
 
@@ -31,7 +31,7 @@
 **Interfaces:**
 - Produces: proyecto `Reto7` que compila, con `com.example.reto7.{MainActivity, BoardView, TicTacToeGame}`.
 
-- [ ] **Step 1: Copiar el árbol**
+- [x] **Step 1: Copiar el árbol**
 
 ```bash
 cd /d/Escritorio/DADM-2026-2/Retos
@@ -41,7 +41,7 @@ cd .. && cp -r Reto7-tmp/. Reto7/ && rm -rf Reto7-tmp
 
 (`Reto7/` ya existe por `docs/`; se fusiona.)
 
-- [ ] **Step 2: Mover paquetes y renombrar**
+- [x] **Step 2: Mover paquetes y renombrar**
 
 ```bash
 cd /d/Escritorio/DADM-2026-2/Retos/Reto7
@@ -53,18 +53,18 @@ grep -rn --exclude-dir=docs -i 'reto6' . || echo "OK: no quedan referencias"
 
 Expected: `OK: no quedan referencias`.
 
-- [ ] **Step 3: Crear `local.properties` para el SDK**
+- [x] **Step 3: Crear `local.properties` para el SDK**
 
 ```bash
 cp ../Reto6/local.properties .
 ```
 
-- [ ] **Step 4: Verificar build y tests**
+- [x] **Step 4: Verificar build y tests**
 
 Run: `./gradlew assembleDebug testDebugUnitTest`
 Expected: `BUILD SUCCESSFUL`, tests de `TicTacToeGameTest` en verde.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Retos/Reto7 && git commit -m "Reto7: clone Reto6 as starting point"
@@ -80,11 +80,11 @@ git add Retos/Reto7 && git commit -m "Reto7: clone Reto6 as starting point"
 **Interfaces:**
 - Produces: `FirebaseDatabase` y `FirebaseAuth` disponibles en `app`; alias de catálogo `libs.firebase.bom`, `libs.firebase.database`, `libs.firebase.auth`, `libs.plugins.google.services`.
 
-- [ ] **Step 1: Version catalog** — en `gradle/libs.versions.toml` agregar:
+- [x] **Step 1: Version catalog** — en `gradle/libs.versions.toml` agregar:
 
 ```toml
 # [versions]
-firebaseBom = "35.0.1"
+firebaseBom = "34.19.0"
 googleServices = "4.5.0"
 
 # [libraries]
@@ -96,7 +96,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 ```
 
-- [ ] **Step 2: Plugins y dependencias**
+- [x] **Step 2: Plugins y dependencias**
 
 `build.gradle.kts` (raíz):
 
@@ -123,7 +123,7 @@ dependencies {
 }
 ```
 
-- [ ] **Step 3: `.gitignore` y permiso INTERNET**
+- [x] **Step 3: `.gitignore` y permiso INTERNET**
 
 Agregar al final de `Retos/Reto7/.gitignore`:
 
@@ -139,18 +139,18 @@ En `AndroidManifest.xml`, antes de `<application>`:
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-- [ ] **Step 4: Verificar compatibilidad del plugin con AGP 9.3.2**
+- [x] **Step 4: Verificar compatibilidad del plugin con AGP 9.3.2**
 
 Run: `./gradlew assembleDebug`
 Expected (sin `google-services.json` todavía): falla en la tarea `processDebugGoogleServices` con `File google-services.json is missing`. Ese error demuestra que el plugin cargó y se integró con AGP 9.3.2 → compatible.
 
 Si en cambio falla al configurar el proyecto (errores de API de AGP, `BaseExtension`, `applicationVariants`, etc.): aplicar el **Plan B** del spec (sección 2): quitar `alias(libs.plugins.google.services)` de ambos `build.gradle.kts` (y su entrada `[plugins]`), y en la Task 3 crear `app/src/main/res/values/google_services.xml` a mano.
 
-- [ ] **Step 5: Verificar que el resto compila sin el plugin aplicado**
+- [x] **Step 5: Verificar que el resto compila sin el plugin aplicado**
 
 Comentar temporalmente `alias(libs.plugins.google.services)` en `app/build.gradle.kts`, correr `./gradlew assembleDebug testDebugUnitTest` → `BUILD SUCCESSFUL` (las dependencias de Firebase resuelven); descomentar.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Retos/Reto7 && git commit -m "Reto7: add Firebase Realtime Database and Auth dependencies"
@@ -163,10 +163,10 @@ git add Retos/Reto7 && git commit -m "Reto7: add Firebase Realtime Database and 
 **Files:**
 - Create (no versionado): `Retos/Reto7/app/google-services.json` (o, con Plan B, `app/src/main/res/values/google_services.xml`)
 
-- [ ] **Step 1:** <https://console.firebase.google.com> → **Agregar proyecto** (p. ej. `triqui-online`), Google Analytics desactivado.
-- [ ] **Step 2:** **Build → Authentication → Comenzar → Sign-in method → Anónimo → Habilitar.**
-- [ ] **Step 3:** **Build → Realtime Database → Crear base de datos** → cualquier ubicación → **modo bloqueado**.
-- [ ] **Step 4:** Pestaña **Reglas** → pegar y **Publicar**:
+- [x] **Step 1:** <https://console.firebase.google.com> → **Agregar proyecto** (p. ej. `triqui-online`), Google Analytics desactivado.
+- [x] **Step 2:** **Build → Authentication → Comenzar → Sign-in method → Anónimo → Habilitar.**
+- [x] **Step 3:** **Build → Realtime Database → Crear base de datos** → cualquier ubicación → **modo bloqueado**.
+- [x] **Step 4:** Pestaña **Reglas** → pegar y **Publicar**:
 
 ```json
 {
@@ -182,9 +182,9 @@ git add Retos/Reto7 && git commit -m "Reto7: add Firebase Realtime Database and 
 }
 ```
 
-- [ ] **Step 5:** **Configuración del proyecto → Agregar app → Android**, paquete `com.example.reto7` (sin SHA-1).
-- [ ] **Step 6:** Descargar `google-services.json` (después del Step 3, para que incluya `firebase_url`) y copiarlo a `Retos/Reto7/app/`.
-- [ ] **Step 7: Verificar**
+- [x] **Step 5:** **Configuración del proyecto → Agregar app → Android**, paquete `com.example.reto7` (sin SHA-1).
+- [x] **Step 6:** Descargar `google-services.json` (después del Step 3, para que incluya `firebase_url`) y copiarlo a `Retos/Reto7/app/`.
+- [x] **Step 7: Verificar**
 
 Run: `./gradlew assembleDebug`
 Expected: `BUILD SUCCESSFUL`. Comprobar que `git status` no muestra `google-services.json`.
