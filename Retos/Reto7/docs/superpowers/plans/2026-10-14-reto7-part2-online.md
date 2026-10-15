@@ -36,7 +36,7 @@
   - `fun markOf(uid: String): Char?`, `fun opponentName(myMark: Char): String`, `fun isRoundOver(): Boolean`, `fun rematchRequested(mark: Char): Boolean`, `fun toMap(): Map<String, Any?>`
   - `companion`: `MARK_X`, `MARK_O`, `STATUS_WAITING`, `STATUS_PLAYING`, `STATUS_ABANDONED`, `EMPTY_BOARD`, `fun fromMap(map: Map<*, *>?): OnlineGame?`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```kotlin
 package com.example.reto7
@@ -130,12 +130,12 @@ class OnlineGameTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `./gradlew testDebugUnitTest --tests "com.example.reto7.OnlineGameTest"`
 Expected: FAIL — `Unresolved reference 'OnlineGame'`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```kotlin
 package com.example.reto7
@@ -248,12 +248,12 @@ data class OnlineGame(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `./gradlew testDebugUnitTest --tests "com.example.reto7.OnlineGameTest"`
 Expected: PASS (8 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGame state with database map conversion"
@@ -271,7 +271,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGame state with d
 - Consumes: `OnlineGame` (Task 1), `TicTacToeGame.setBoardState/setMove/checkForWinner/getBoardState`.
 - Produces: `object OnlineGameRules` with `newGame(hostUid: String, hostName: String): OnlineGame`, `join(game: OnlineGame, uid: String, name: String): OnlineGame?`, `applyMove(game: OnlineGame, mark: Char, pos: Int): OnlineGame?`, `requestRematch(game: OnlineGame, mark: Char): OnlineGame?`, `other(mark: Char): Char`. `null` = operación inválida.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```kotlin
 package com.example.reto7
@@ -402,12 +402,12 @@ class OnlineGameRulesTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `./gradlew testDebugUnitTest --tests "com.example.reto7.OnlineGameRulesTest"`
 Expected: FAIL — `Unresolved reference 'OnlineGameRules'`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```kotlin
 package com.example.reto7
@@ -476,12 +476,12 @@ object OnlineGameRules {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `./gradlew testDebugUnitTest`
 Expected: PASS (todos: `TicTacToeGameTest`, `OnlineGameTest`, `OnlineGameRulesTest`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameRules for joining, moves and rematches"
@@ -501,7 +501,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameRules for joi
   - `class GameRepository` con `class Subscription { fun cancel() }`, `observeWaitingGames(onChange: (List<Pair<String, OnlineGame>>) -> Unit): Subscription`, `observeGame(gameId: String, onChange: (OnlineGame?) -> Unit): Subscription`, `createGame(uid: String, name: String, onResult: (String?) -> Unit)`, `joinGame(gameId: String, uid: String, name: String, onResult: (Boolean) -> Unit)`, `makeMove(gameId: String, mark: Char, pos: Int, onResult: (Boolean) -> Unit)`, `requestRematch(gameId: String, mark: Char)`, `armDisconnectForWaiting(gameId: String)`, `armDisconnectForPlaying(gameId: String)`, `leaveGame(gameId: String, status: String?)`.
   - `UiHelpers.kt`: `applySystemBarPadding(root: View)`, `showMenuPopup(anchor: View, menuRes: Int, onItemClick: (Int) -> Boolean)`, `showAboutDialog(activity: Activity)`.
 
-- [ ] **Step 1: Escribir `GameRepository.kt`**
+- [x] **Step 1: Escribir `GameRepository.kt`**
 
 ```kotlin
 package com.example.reto7
@@ -646,7 +646,7 @@ class GameRepository {
 }
 ```
 
-- [ ] **Step 2: Escribir `UiHelpers.kt`**
+- [x] **Step 2: Escribir `UiHelpers.kt`**
 
 ```kotlin
 package com.example.reto7
@@ -693,12 +693,12 @@ fun showAboutDialog(activity: Activity) {
 }
 ```
 
-- [ ] **Step 3: Verificar que compila y los tests siguen pasando**
+- [x] **Step 3: Verificar que compila y los tests siguen pasando**
 
 Run: `./gradlew assembleDebug testDebugUnitTest`
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Firebase and shared UI helpers"
@@ -717,7 +717,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Fir
 - Consumes: `GameRepository`, `OnlineGame`, `OnlineGameRules.other`, `applySystemBarPadding`, `showMenuPopup`, `showAboutDialog`, `BoardView`, `TicTacToeGame`.
 - Produces: `OnlineGameActivity.EXTRA_GAME_ID: String` (extra String) y `OnlineGameActivity.EXTRA_MY_MARK: String` (extra Char).
 
-- [ ] **Step 1: Strings** — agregar antes de `</resources>` en `values/strings.xml`:
+- [x] **Step 1: Strings** — agregar antes de `</resources>` en `values/strings.xml`:
 
 ```xml
     <string name="online_waiting_opponent">Waiting for an opponent…</string>
@@ -734,7 +734,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Fir
     <string name="menu_leave_game">Leave game</string>
 ```
 
-- [ ] **Step 2: Menú `res/menu/online_menu.xml`**
+- [x] **Step 2: Menú `res/menu/online_menu.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -749,7 +749,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Fir
 </menu>
 ```
 
-- [ ] **Step 3: Layout vertical `res/layout/activity_online_game.xml`**
+- [x] **Step 3: Layout vertical `res/layout/activity_online_game.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -834,7 +834,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Fir
 </FrameLayout>
 ```
 
-- [ ] **Step 4: Layout horizontal `res/layout-land/activity_online_game.xml`**
+- [x] **Step 4: Layout horizontal `res/layout-land/activity_online_game.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -919,7 +919,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add GameRepository over Fir
 </FrameLayout>
 ```
 
-- [ ] **Step 5: `OnlineGameActivity.kt`**
+- [x] **Step 5: `OnlineGameActivity.kt`**
 
 ```kotlin
 package com.example.reto7
@@ -1167,7 +1167,7 @@ class OnlineGameActivity : AppCompatActivity() {
 }
 ```
 
-- [ ] **Step 6: Registrar la Activity** — en `AndroidManifest.xml`, dentro de `<application>` después de `.MainActivity`:
+- [x] **Step 6: Registrar la Activity** — en `AndroidManifest.xml`, dentro de `<application>` después de `.MainActivity`:
 
 ```xml
         <activity
@@ -1175,12 +1175,12 @@ class OnlineGameActivity : AppCompatActivity() {
             android:exported="false" />
 ```
 
-- [ ] **Step 7: Verificar**
+- [x] **Step 7: Verificar**
 
 Run: `./gradlew assembleDebug testDebugUnitTest`
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for playing against a remote opponent"
@@ -1198,7 +1198,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for 
 **Interfaces:**
 - Consumes: `GameRepository`, `OnlineGame`, `OnlineGameActivity.EXTRA_GAME_ID/EXTRA_MY_MARK`, `MainActivity`, `applySystemBarPadding`, `showMenuPopup`, `showAboutDialog`, `FirebaseAuth`.
 
-- [ ] **Step 1: Strings** — agregar antes de `</resources>` y reemplazar `about_description`:
+- [x] **Step 1: Strings** — agregar antes de `</resources>` y reemplazar `about_description`:
 
 ```xml
     <string name="lobby_title">Tic-Tac-Toe Online</string>
@@ -1223,7 +1223,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for 
     <string name="about_description">Play online against a friend, or against Android at one of three difficulty levels. Don\'t let the Android beat you!</string>
 ```
 
-- [ ] **Step 2: Menú `res/menu/lobby_menu.xml`**
+- [x] **Step 2: Menú `res/menu/lobby_menu.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1238,7 +1238,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for 
 </menu>
 ```
 
-- [ ] **Step 3: `res/layout/dialog_name.xml`**
+- [x] **Step 3: `res/layout/dialog_name.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1262,7 +1262,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for 
 </FrameLayout>
 ```
 
-- [ ] **Step 4: `res/layout/activity_lobby.xml`**
+- [x] **Step 4: `res/layout/activity_lobby.xml`**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1354,7 +1354,7 @@ git add Retos/Reto7/app/src && git commit -m "Reto7: add OnlineGameActivity for 
 </FrameLayout>
 ```
 
-- [ ] **Step 5: `LobbyActivity.kt`**
+- [x] **Step 5: `LobbyActivity.kt`**
 
 ```kotlin
 package com.example.reto7
@@ -1569,7 +1569,7 @@ class LobbyActivity : AppCompatActivity() {
 }
 ```
 
-- [ ] **Step 6: Manifest** — `LobbyActivity` pasa a ser el launcher y `MainActivity` deja de exportarse. Reemplazar el bloque de `.MainActivity` por:
+- [x] **Step 6: Manifest** — `LobbyActivity` pasa a ser el launcher y `MainActivity` deja de exportarse. Reemplazar el bloque de `.MainActivity` por:
 
 ```xml
         <activity
@@ -1586,12 +1586,12 @@ class LobbyActivity : AppCompatActivity() {
             android:exported="false" />
 ```
 
-- [ ] **Step 7: Verificar**
+- [x] **Step 7: Verificar**
 
 Run: `./gradlew assembleDebug testDebugUnitTest lintDebug`
 Expected: `BUILD SUCCESSFUL`; sin errores de lint nuevos.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add Retos/Reto7/app/src && git commit -m "Reto7: add LobbyActivity as the launcher with game list and name prompt"
