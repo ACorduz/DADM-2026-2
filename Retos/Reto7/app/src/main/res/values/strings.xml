@@ -32,4 +32,17 @@
     <string name="about_by">By ACorduz</string>
     <string name="about_description">Choose from one of three difficulty levels. Don\'t let the Android beat you!</string>
     <string name="about_ok">OK</string>
+
+    <string name="online_waiting_opponent">Waiting for an opponent…</string>
+    <string name="online_your_turn">Your turn (%1$s)</string>
+    <string name="online_opponent_turn">%1$s\'s turn</string>
+    <string name="online_opponent_won">%1$s won!</string>
+    <string name="online_rematch">Rematch</string>
+    <string name="online_rematch_waiting">Waiting for %1$s…</string>
+    <string name="online_rematch_offered">%1$s wants a rematch!</string>
+    <string name="online_opponent_left">Your opponent left the game.</string>
+    <string name="online_opponent">Opponent</string>
+    <string name="score_you">You: %1$d</string>
+    <string name="score_opponent">%1$s: %2$d</string>
+    <string name="menu_leave_game">Leave game</string>
 </resources>
