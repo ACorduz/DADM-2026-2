@@ -163,10 +163,10 @@ git add Retos/Reto7 && git commit -m "Reto7: add Firebase Realtime Database and 
 **Files:**
 - Create (no versionado): `Retos/Reto7/app/google-services.json` (o, con Plan B, `app/src/main/res/values/google_services.xml`)
 
-- [ ] **Step 1:** <https://console.firebase.google.com> → **Agregar proyecto** (p. ej. `triqui-online`), Google Analytics desactivado.
-- [ ] **Step 2:** **Build → Authentication → Comenzar → Sign-in method → Anónimo → Habilitar.**
-- [ ] **Step 3:** **Build → Realtime Database → Crear base de datos** → cualquier ubicación → **modo bloqueado**.
-- [ ] **Step 4:** Pestaña **Reglas** → pegar y **Publicar**:
+- [x] **Step 1:** <https://console.firebase.google.com> → **Agregar proyecto** (p. ej. `triqui-online`), Google Analytics desactivado.
+- [x] **Step 2:** **Build → Authentication → Comenzar → Sign-in method → Anónimo → Habilitar.**
+- [x] **Step 3:** **Build → Realtime Database → Crear base de datos** → cualquier ubicación → **modo bloqueado**.
+- [x] **Step 4:** Pestaña **Reglas** → pegar y **Publicar**:
 
 ```json
 {
@@ -182,9 +182,9 @@ git add Retos/Reto7 && git commit -m "Reto7: add Firebase Realtime Database and 
 }
 ```
 
-- [ ] **Step 5:** **Configuración del proyecto → Agregar app → Android**, paquete `com.example.reto7` (sin SHA-1).
-- [ ] **Step 6:** Descargar `google-services.json` (después del Step 3, para que incluya `firebase_url`) y copiarlo a `Retos/Reto7/app/`.
-- [ ] **Step 7: Verificar**
+- [x] **Step 5:** **Configuración del proyecto → Agregar app → Android**, paquete `com.example.reto7` (sin SHA-1).
+- [x] **Step 6:** Descargar `google-services.json` (después del Step 3, para que incluya `firebase_url`) y copiarlo a `Retos/Reto7/app/`.
+- [x] **Step 7: Verificar**
 
 Run: `./gradlew assembleDebug`
 Expected: `BUILD SUCCESSFUL`. Comprobar que `git status` no muestra `google-services.json`.
