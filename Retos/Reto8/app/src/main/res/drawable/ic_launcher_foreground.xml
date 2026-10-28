@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher icon: an office building, windows and door cut out so the
+     background shows through. Everything stays inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M36,32h36v46h-36z M42,38h6v6h-6z M51,38h6v6h-6z M60,38h6v6h-6z M42,48h6v6h-6z M51,48h6v6h-6z M60,48h6v6h-6z M42,58h6v6h-6z M60,58h6v6h-6z M50,66h8v12h-8z" />
+</vector>

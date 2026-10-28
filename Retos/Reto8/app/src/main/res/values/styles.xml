@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Toolbar inside an AppBarLayout: purple in light mode, dark surface in
+         dark mode; white title and icons in both. -->
+    <style name="AppToolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
+    </style>
+
+    <!-- Detail screen: a small caption above each value -->
+    <style name="DetailLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceCaption</item>
+    </style>
+
+    <style name="DetailValue">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textIsSelectable">true</item>
+    </style>
+
+    <!-- Values that open another app when tapped -->
+    <style name="DetailLink" parent="DetailValue">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textIsSelectable">false</item>
+    </style>
+
+    <!-- The clickable rows (label + link) on the detail screen -->
+    <style name="DetailLinkRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="FormField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+</resources>

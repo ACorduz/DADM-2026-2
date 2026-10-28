@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            style="@style/AppToolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                style="@style/DetailLabel"
+                android:layout_marginTop="0dp"
+                android:text="@string/label_classification" />
+
+            <TextView
+                android:id="@+id/classifications"
+                style="@style/DetailValue" />
+
+            <LinearLayout
+                android:id="@+id/products_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/DetailLabel"
+                    android:text="@string/label_products" />
+
+                <TextView
+                    android:id="@+id/products"
+                    style="@style/DetailValue" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/url_row"
+                style="@style/DetailLinkRow">
+
+                <TextView
+                    style="@style/DetailLabel"
+                    android:text="@string/label_url" />
+
+                <TextView
+                    android:id="@+id/url"
+                    style="@style/DetailLink" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/phone_row"
+                style="@style/DetailLinkRow">
+
+                <TextView
+                    style="@style/DetailLabel"
+                    android:text="@string/label_phone" />
+
+                <TextView
+                    android:id="@+id/phone"
+                    style="@style/DetailLink" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/email_row"
+                style="@style/DetailLinkRow">
+
+                <TextView
+                    style="@style/DetailLabel"
+                    android:text="@string/label_email" />
+
+                <TextView
+                    android:id="@+id/email"
+                    style="@style/DetailLink" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
