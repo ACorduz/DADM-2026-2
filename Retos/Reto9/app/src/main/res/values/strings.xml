@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Reto 9</string>
+
+    <string name="title_map">Lugares cercanos</string>
+    <string name="title_settings">Preferencias</string>
+
+    <string name="action_refresh">Actualizar</string>
+    <string name="action_settings">Preferencias</string>
+
+    <string name="you_are_here">Estás aquí</string>
+    <string name="waiting_location">Buscando tu ubicación…</string>
+    <string name="loading_places">Buscando lugares cercanos…</string>
+    <string name="status">%1$.5f, %2$.5f · %3$d lugares a %4$s km</string>
+    <string name="distance">A %1$.2f km</string>
+    <string name="no_permission">Se necesita el permiso de ubicación para mostrar los lugares cercanos.</string>
+    <string name="location_off">Activa la ubicación (GPS) del dispositivo.</string>
+    <string name="load_failed">No se pudieron cargar los lugares. Revisa tu conexión.</string>
+
+    <!-- Preferences -->
+    <string name="pref_radius_title">Radio de búsqueda (km)</string>
+    <string name="pref_category_title">Tipo de lugar</string>
+    <string name="error_radius">Escribe un radio entre 0.1 y 50 km</string>
+
+    <string-array name="category_entries">
+        <item>Hospitales</item>
+        <item>Clínicas</item>
+        <item>Farmacias</item>
+        <item>Lugares turísticos</item>
+        <item>Museos</item>
+        <item>Restaurantes</item>
+        <item>Bancos</item>
+        <item>Estaciones de policía</item>
+    </string-array>
+    <!-- OpenStreetMap tags (key=value) used in the Overpass query -->
+    <string-array name="category_values">
+        <item>amenity=hospital</item>
+        <item>amenity=clinic</item>
+        <item>amenity=pharmacy</item>
+        <item>tourism=attraction</item>
+        <item>tourism=museum</item>
+        <item>amenity=restaurant</item>
+        <item>amenity=bank</item>
+        <item>amenity=police</item>
+    </string-array>
+</resources>
